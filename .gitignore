@@ -1,3 +1,8 @@
+# menate di visual studio
+.vs
+
+
 # ambiente virtuale
 DL_forgery_segmentation/__pycache__
 DL_forgery_segmentation/TF_keras_segmentation_models/
+
