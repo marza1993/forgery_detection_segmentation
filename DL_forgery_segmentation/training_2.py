@@ -16,7 +16,7 @@ from segmentation_models import Unet
 import os
 from ModelOnLossImprCheckpoint import ModelOnLossImprCheckpoint
 
-
+# menate
 # prova tolto ambiente da git
 
 #PATH_BASE = "D:\\dottorato\\copy_move\\DB_mio\\"
