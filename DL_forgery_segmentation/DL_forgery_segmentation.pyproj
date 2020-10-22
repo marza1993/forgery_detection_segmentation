@@ -37,9 +37,6 @@
     <Compile Include="my_losses.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="prediction.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="prediction2.py">
       <SubType>Code</SubType>
     </Compile>
@@ -52,7 +49,6 @@
     <Compile Include="segmentation_model.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="training.py" />
     <Compile Include="training_2.py">
       <SubType>Code</SubType>
     </Compile>

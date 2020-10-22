@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 from my_losses import dice_coef_loss
 import os
 import re
-from keras.metrics import MeanIoU
+from tensorflow.keras.metrics import MeanIoU
 import numpy as np
 import random
+import save_load_model_utility
 
 
 PATH_BASE = "D:\\dottorato\\copy_move\\DB_mio\\"
@@ -18,11 +19,12 @@ PATH_BASE = "D:\\dottorato\\copy_move\\DB_mio\\"
 TEST_IMAGES_FOLDER = PATH_BASE + "test_images\\test\\"
 TEST_MASKS_FOLDER = PATH_BASE + "test_masks\\test\\"
 MODEL_FILE_NAME = "model.hdf5"
+WEIGHTS_FILE_NAME = "weights.hdf5"
 
 
 target_W = 256
 target_H = 256
-batch_size = 16
+batch_size = 8
 
 
 data_test = data_loader(batch_size, TEST_IMAGES_FOLDER, TEST_MASKS_FOLDER, img_size = (target_H, target_W), apply_augmentation=False)
@@ -33,7 +35,11 @@ model = None
 model_path = input("directory del modello salvato: ")
 if model_path[-1] != "\\":
     model_path = model_path + "\\"
-    model = keras.models.load_model(model_path + MODEL_FILE_NAME, custom_objects = {'dice_coef_loss' : dice_coef_loss})
+    model = save_load_model_utility.load_model(model_path + MODEL_FILE_NAME, model_path + WEIGHTS_FILE_NAME)
+
+    # compilo il modello
+    mean_iou = MeanIoU(num_classes = 2, name = 'mean_iou')
+    model.compile(optimizer='adam', loss=dice_coef_loss, metrics=[mean_iou, 'accuracy'])
 
 
 

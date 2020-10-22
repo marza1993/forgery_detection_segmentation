@@ -1,4 +1,6 @@
 import keras
+import save_load_model_utility
+
 
 WEIGHTS_FILE_NAME = "weights.hdf5"
 MODEL_FILE_NAME = "model.hdf5"
@@ -32,7 +34,7 @@ class ModelOnLossImprCheckpoint(keras.callbacks.Callback):
         if new_val_loss < old_val_loss:
 
             # salvo il modello
-            self.model.save(self.model_path)
+            save_load_model_utility.save_model(self.model, self.model_path, self.weights_path)
 
             print('\nEpoca %05d: val_loss migliorata da %0.5f a %0.5f, salvo il modello in %s' 
                   % (epoch + 1, old_val_loss, new_val_loss, self.model_path))

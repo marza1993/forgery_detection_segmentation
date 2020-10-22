@@ -2,11 +2,10 @@ import tensorflow as tf
 import datetime
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from keras.callbacks import TensorBoard
-from keras.models import load_model
+from tensorflow.keras.optimizers import Adam
 from data_generator import data_loader
 from segmentation_model import segmentation_model
 import matplotlib.pyplot as plt
-#from keras.metrics import MeanIoU
 from tensorflow.keras.metrics import MeanIoU
 from tensorflow import keras
 from my_losses import jaccard_distance_loss, dice_coef_loss, dice_coef, weighted_loss
@@ -15,13 +14,11 @@ from ImageLogger import ImageHistory
 from segmentation_models import Unet
 import os
 from ModelOnLossImprCheckpoint import ModelOnLossImprCheckpoint
+import save_load_model_utility
 
-# menate dopo rbe
-# prova tolto ambiente da git
 
-#PATH_BASE = "D:\\dottorato\\copy_move\\DB_mio\\"
-PATH_BASE = "D:\\dottorato\\copy_move\\DB_mio_small\\"
-
+PATH_BASE = "D:\\dottorato\\copy_move\\DB_mio\\"
+#PATH_BASE = "D:\\dottorato\\copy_move\\DB_mio_small\\"
 TRAIN_IMAGES_FOLDER = PATH_BASE + "train_images\\train\\"
 TRAIN_MASKS_FOLDER = PATH_BASE + "train_masks\\train\\"
 VAL_IMAGES_FOLDER = PATH_BASE + "val_images\\val\\"
@@ -80,7 +77,13 @@ if resp == "s":
         model_path = model_path + "\\"
 
     # carico il modello 
-    model = keras.models.load_model(model_path + MODEL_FILE_NAME, custom_objects = {'dice_coef_loss' : dice_coef_loss})
+    model = save_load_model_utility.load_model(model_path + MODEL_FILE_NAME, model_path + WEIGHTS_FILE_NAME)
+
+    # compilo il modello, impostando un learning rate iniziale
+    mean_iou = MeanIoU(num_classes = 2, name = 'mean_iou')
+    lr = float(input("learning rate: "))
+    opt = Adam(learning_rate = lr)
+    model.compile(optimizer=opt, loss=dice_coef_loss, metrics=[mean_iou, 'accuracy'])
 
     # se il file con la migliore loss non esiste lo creo
     if not os.path.isfile(model_path + LOSS_FILE_NAME):
@@ -116,11 +119,11 @@ print("metrics:")
 print(model.metrics_names)  
 
 
-N_epochs = 50
+N_epochs = int(input("N epoche: "))
 
 # creo le callback per il training
 checkpoint = ModelOnLossImprCheckpoint(model_path)
-early_stopping = EarlyStopping(monitor='val_mean_iou', mode='max', verbose=1, patience=N_epochs)
+early_stopping = EarlyStopping(monitor='val_mean_iou', mode='max', verbose=1, patience=5)
 #reduceLR = ReduceLROnPlateau(factor=0.1, patience=5, min_lr=0.00001, verbose=1),
 tensorboard_callback = TensorBoard(log_dir=tensorboard_log_dir, histogram_freq=1, update_freq = 'batch', profile_batch = 0)
 image_logger = ImageHistory(tensorboard_log_dir, data_val,  data_train.N_samples() // batch_size, N_imgs=5)
